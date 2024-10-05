@@ -2,13 +2,13 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-
+require('dotenv').config();
 const router = express.Router();
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res,next) => {
   // Extract username and password from request body
   const { username, password } = req.body;
-
+console.log(username,password);
   // Check if username and password are provided
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
@@ -57,15 +57,30 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Send the token and user role in the response
-    res.json({ token, role: user.role,employeeId:user.employeeId });
+    // Set token as HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Use secure in production
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    // Send user info (except sensitive data) in response
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role
+      }
+    });
   } catch (error) {
     // Log the error for debugging
     console.error('Login error:', error);
     
     // Check for database connection error
     if (error.code === 'ECONNREFUSED') {
-      return res.status(503).json({ error: 'Database connection error' });
+      next(error);
     }
     
     // Generic error response
