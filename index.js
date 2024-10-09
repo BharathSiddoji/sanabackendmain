@@ -5,11 +5,19 @@ const authRoutes = require('./routes/authRoutes');
 const hrRoutes = require('./routes/hrRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const errorMiddleware = require('./utills/errorMiddleware');
+const bodyParser = require('body-parser');
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Add this line here
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 // Use the route files
 app.use('/api/auth', authRoutes);

@@ -26,11 +26,7 @@ router.post('/users', authenticateToken, authorizeHR, validateUserInput, async (
   // Define allowed roles based on your database constraint
   const allowedRoles = ['admin', 'hr', 'employee']; // Adjust this list based on your actual allowed roles
 
-  // Input validation
-  if (!username || !password || !role || !firstName || !lastName || !email || 
-      !dateOfBirth || !address || !jobRole || !dateOfJoining || !department || !employeeId || !pfNumber) {
-    return res.status(400).json({ error: 'All fields are required', });
-  }
+ 
 
   // Check if the role is allowed
   if (!allowedRoles.includes(role.toLowerCase())) {
